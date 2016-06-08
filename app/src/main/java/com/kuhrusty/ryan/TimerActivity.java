@@ -30,7 +30,8 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
 //String KEY_PREF_TIMER_SECONDS = "timer_seconds";
 
-    private final int defaultSecondsRemaining = 5;
+    //  this value is duplicated in pref_general.xml.
+    private final int defaultSecondsRemaining = 30;
     private int secondsRemaining = defaultSecondsRemaining;
     private long timerIntervalMS = 1000L;
 //            getDefaultSharedPreferences(this).getInt(KEY_PREF_TIMER_SECONDS, 30);
