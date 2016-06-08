@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="waitingBG">#000000</color>
+    <color name="waitingFG">#7f7f7f</color>
+    <color name="runningBG">#000000</color>
+    <color name="runningFG">#ff0000</color>
+    <color name="endedBG">#ff0000</color>
+    <color name="endedFG">#000000</color>
+</resources>

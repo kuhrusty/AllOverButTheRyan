@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">All Over But The Ryan</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="arghh1">TAKE YOUR DAMN TURN</string>
+    <string name="arghh2">TAKE YOUR DAMN TURN</string>
+    <string name="arghh3">GOD DAMN IT</string>
+    <string name="arghh4">TAKE YOUR DAMN TURN</string>
+    <string name="arghh5">TAKE YOUR DAMN TURN</string>
+    <string name="arghh6">COME ON CLETUS</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="pref_title_timer_duration">Timer duration</string>
+    <string-array name="pref_timer_duration_titles">
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>15 seconds</item>
+        <item>20 seconds</item>
+        <item>30 seconds</item>
+        <item>60 seconds (really!?)</item>
+        <item>90 seconds (whatever)</item>
+        <item>120 seconds (you\'re killing me)</item>
+    </string-array>
+    <string-array name="pref_timer_duration_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+    </string-array>
+
+    <string name="pref_title_sound">Sound</string>
+    <string-array name="pref_sound_titles">
+        <item>Ryan!</item>
+        <item>Take your damn turn!</item>
+        <item>That\'s it; you pass.</item>
+        <item>Go.  Go!  Go!  Go!  Go!</item>
+        <item>Come on, Cletus!</item>
+        <item>I\'ma stab you in the face.</item>
+        <item>Sequential</item>
+        <item>Random</item>
+    </string-array>
+    <string-array name="pref_sound_values">
+        <item>ryan</item>
+        <item>takeyourdamnturn</item>
+        <item>youpass</item>
+        <item>go1</item>
+        <item>cletus</item>
+        <item>stab</item>
+        <item>sequence</item>
+        <item>random</item>
+    </string-array>
+    <string name="pref_sound_value_random">random</string>
+
+</resources>
