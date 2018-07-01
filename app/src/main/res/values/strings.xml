@@ -19,7 +19,10 @@
         <item>30 seconds</item>
         <item>60 seconds (really!?)</item>
         <item>90 seconds (whatever)</item>
-        <item>120 seconds (you\'re killing me)</item>
+        <item>2 minutes (you\'re killing me)</item>
+        <item>2.5 minutes</item>
+        <item>3 minutes</item>
+        <item>5 minutes</item>
     </string-array>
     <string-array name="pref_timer_duration_values">
         <item>5</item>
@@ -30,6 +33,9 @@
         <item>60</item>
         <item>90</item>
         <item>120</item>
+        <item>150</item>
+        <item>180</item>
+        <item>300</item>
     </string-array>
 
     <string name="pref_title_sound">Sound</string>
