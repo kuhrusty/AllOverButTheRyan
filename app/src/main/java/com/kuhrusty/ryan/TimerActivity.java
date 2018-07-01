@@ -249,7 +249,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_CODE_SETTINGS);
             return true;
         }
 
