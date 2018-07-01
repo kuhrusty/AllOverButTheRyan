@@ -62,7 +62,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         // Create the text view
         TextView tv = new TextView(this);
         tv.setTextSize(120);
-        tv.setText(Integer.toString(secondsRemaining));
+        tv.setText(formatSeconds(secondsRemaining));
         tv.setTextColor(res.getColor(R.color.waitingFG));
         tv.setBackgroundColor(res.getColor(R.color.waitingBG));
         tv.setGravity(Gravity.CENTER);
@@ -106,7 +106,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         secondsRemaining = Integer.parseInt(sharedPref.getString(SettingsActivity.KEY_PREF_TIMER_DURATION, "" + defaultSecondsRemaining));
 
         Resources res = getResources();
-        timerDisplay.setText(Integer.toString(secondsRemaining));
+        timerDisplay.setText(formatSeconds(secondsRemaining));
         timerDisplay.setTextColor(res.getColor(R.color.waitingFG));
         timerDisplay.setBackgroundColor(res.getColor(R.color.waitingBG));
     }
@@ -143,8 +143,21 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         timerDisplay.setBackgroundColor(res.getColor(R.color.runningBG));
     }
 
+    /**
+     * Format seconds remaining as minutes:seconds.
+     */
+    String formatSeconds(int secondsRemaining) {
+        if (secondsRemaining < 60) {
+            return Integer.toString(secondsRemaining);
+        }
+        int mins = secondsRemaining / 60;
+        int secs = secondsRemaining % 60;
+        //  real classy
+        return mins + ":" + ((secs > 9) ? "" : "0") + secs;
+    }
+
     void handleTick(int secondsRemaining) {
-        timerDisplay.setText(Integer.toString(secondsRemaining));
+        timerDisplay.setText(formatSeconds(secondsRemaining));
     }
 
     void handleTimeUp() {
