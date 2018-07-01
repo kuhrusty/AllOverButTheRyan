@@ -38,6 +38,8 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
     private long timerIntervalMS = 1000L;
 //            getDefaultSharedPreferences(this).getInt(KEY_PREF_TIMER_SECONDS, 30);
     private boolean timerRunning = false;
+    private boolean timerFinished = false;
+    private boolean isSand = false;
     private int runs = 0;
     private int timeouts = 0;
 
@@ -60,6 +62,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         timerDuration = SettingsActivity.getTimerDuration(sharedPref);
         secondsRemaining = timerDuration;
+        isSand = SettingsActivity.isSand(sharedPref);
 
         // Create the text view
         TextView tv = new TextView(this);
@@ -83,8 +86,14 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (timerRunning) {
+                if (timerFinished) {
                     resetTimer();
+                } else if (timerRunning) {
+                    if (isSand) {
+                        flipTimer();
+                    } else {
+                        resetTimer();
+                    }
                 } else {
                     startTimer();
                 }
@@ -96,6 +105,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
     void resetTimer() {
         timerRunning = false;
+        timerFinished = false;
         if (timer != null) {
             timer.cancel();
             timer = null;
@@ -112,6 +122,19 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         timerDisplay.setBackgroundColor(res.getColor(R.color.waitingBG));
     }
 
+    void flipTimer() {
+        //  necessary?
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        //  This is not *exactly* right, as if the timer runs 4.5 seconds,
+        //  we're gaining or losing half a second.  I think that'll be OK
+        //  for board games, though.
+        secondsRemaining = timerDuration - secondsRemaining;
+        startTimer();
+    }
+
     void startTimer() {
         if (timer != null) {
             timer.cancel();
@@ -126,7 +149,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         timer = new CountDownTimer(secondsRemaining * 1000L, timerIntervalMS / 2) {
             @Override
             public void onTick(long millisUntilFinished) {
-                int secondsRemaining = (int)((millisUntilFinished - 1L) / 1000L) + 1;
+                secondsRemaining = (int)((millisUntilFinished - 1L) / 1000L) + 1;
                 //Log.d(LOG_TAG, "timer onTick(" + millisUntilFinished +
                 //        "), calling it " + secondsRemaining + "s remaining");
                 handleTick(secondsRemaining);
@@ -139,6 +162,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         };
         timer.start();
         timerRunning = true;
+        timerFinished = false;
         Resources res = getResources();
         timerDisplay.setTextColor(res.getColor(R.color.runningFG));
         timerDisplay.setBackgroundColor(res.getColor(R.color.runningBG));
@@ -164,6 +188,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
     void handleTimeUp() {
         //  set timer = null?
         ++timeouts;
+        timerFinished = true;
         Resources res = getResources();
         CharSequence text = res.getText(R.string.arghh1);
         //  for debugging, let's run through the list of strings sequentially.
@@ -280,6 +305,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             timerDuration = SettingsActivity.getTimerDuration(sharedPref);
+            isSand = SettingsActivity.isSand(sharedPref);
             resetTimer();
         }
     }

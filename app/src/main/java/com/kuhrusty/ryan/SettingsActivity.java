@@ -3,11 +3,13 @@ package com.kuhrusty.ryan;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -28,6 +30,7 @@ public class SettingsActivity extends PreferenceActivity {
     /**  in seconds. */
     public static final String KEY_PREF_TIMER_DURATION = "timer_duration";
     public static final String KEY_PREF_SOUND = "sound";
+    public static final String KEY_PREF_SAND = "sand";
 
     /**
      * Returns the currently selected timer duration in seconds.
@@ -45,6 +48,14 @@ public class SettingsActivity extends PreferenceActivity {
      */
     public static String getSound(SharedPreferences prefs) {
         return prefs.getString(KEY_PREF_SOUND, "ryan");
+    }
+    /**
+     * Returns true if sand-timer mode is currently selected.
+     *
+     * @param prefs must not be null.
+     */
+    public static boolean isSand(SharedPreferences prefs) {
+        return prefs.getBoolean(KEY_PREF_SAND, false);
     }
 
     @Override
@@ -101,7 +112,9 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
 
-            if (preference instanceof ListPreference) {
+            if (KEY_PREF_SAND.equals(preference.getKey())) {
+                preference.setSummary(R.string.pref_summary_sand);
+            } else if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
                 ListPreference listPreference = (ListPreference) preference;
@@ -159,10 +172,22 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
 
         // Trigger the listener immediately with the preference's
         // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+        manuallyTriggerPreferenceChange(sBindPreferenceSummaryToValueListener, preference);
+    }
+
+    private static void manuallyTriggerPreferenceChange(Preference.OnPreferenceChangeListener pcl,
+                                                        Preference preference) {
+        Object value = null;
+        if ((preference instanceof CheckBoxPreference) || (preference instanceof SwitchPreference)) {
+            value = PreferenceManager
+                    .getDefaultSharedPreferences(preference.getContext())
+                    .getBoolean(preference.getKey(), false);
+        } else {
+            value = PreferenceManager
+                    .getDefaultSharedPreferences(preference.getContext())
+                    .getString(preference.getKey(), "");
+        }
+        pcl.onPreferenceChange(preference, value);
     }
 
     /**
@@ -201,6 +226,7 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(KEY_PREF_TIMER_DURATION));
             bindPreferenceSummaryToValue(findPreference(KEY_PREF_SOUND));
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_SAND));
         }
 
 //        @Override
