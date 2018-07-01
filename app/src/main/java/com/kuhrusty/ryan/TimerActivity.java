@@ -29,6 +29,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
     private static final String LOG_TAG = "AllOverButTheRyan";
 
+    private static final int REQUEST_CODE_SETTINGS = 1;
 //String KEY_PREF_TIMER_SECONDS = "timer_seconds";
 
     //  this value is duplicated in pref_general.xml.
@@ -255,18 +256,6 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //  did our timer duration change?
-        if (!timerRunning) {
-            resetTimer();
-        }
-//Log.d(LOG_TAG, "got onResume(), registering pref change listener");
-//        PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-////.getPreference(SettingsActivity.KEY_PREF_TIMER_DURATION)
-//                .registerOnSharedPreferenceChangeListener(this);
-    }
 //    @Override
 //    protected void onPause() {
 //        super.onPause();
@@ -283,4 +272,15 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 //            }
 //        }
 //    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_SETTINGS) {
+            //  we don't care about the resultCode.
+
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            timerDuration = SettingsActivity.getTimerDuration(sharedPref);
+            resetTimer();
+        }
+    }
 }
