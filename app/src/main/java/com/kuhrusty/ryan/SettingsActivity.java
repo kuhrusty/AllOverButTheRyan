@@ -31,6 +31,8 @@ public class SettingsActivity extends PreferenceActivity {
     public static final String KEY_PREF_TIMER_DURATION = "timer_duration";
     public static final String KEY_PREF_SOUND = "sound";
     public static final String KEY_PREF_SAND = "sand";
+    public static final String KEY_PREF_COUNTDOWN_DURATION = "countdown_duration";
+    public static final String KEY_PREF_COUNTDOWN_SOUND = "countdown_sound";
 
     /**
      * Returns the currently selected timer duration in seconds.
@@ -56,6 +58,15 @@ public class SettingsActivity extends PreferenceActivity {
      */
     public static boolean isSand(SharedPreferences prefs) {
         return prefs.getBoolean(KEY_PREF_SAND, false);
+    }
+    /**
+     * Returns the currently selected countdown duration (the period in which
+     * we'll play a sound every second) in seconds.
+     *
+     * @param prefs must not be null.
+     */
+    public static int getCountdownDuration(SharedPreferences prefs) {
+        return Integer.parseInt(prefs.getString(KEY_PREF_COUNTDOWN_DURATION, "0"));
     }
 
     @Override
@@ -227,6 +238,8 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
             bindPreferenceSummaryToValue(findPreference(KEY_PREF_TIMER_DURATION));
             bindPreferenceSummaryToValue(findPreference(KEY_PREF_SOUND));
             bindPreferenceSummaryToValue(findPreference(KEY_PREF_SAND));
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_COUNTDOWN_DURATION));
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_COUNTDOWN_SOUND));
         }
 
 //        @Override

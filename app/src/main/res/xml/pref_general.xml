@@ -30,6 +30,24 @@
         android:summary="@string/pref_summary_sand"
         android:defaultValue="false" />
 
+    <ListPreference
+        android:key="countdown_duration"
+        android:title="@string/pref_title_countdown_duration"
+        android:entries="@array/pref_countdown_duration_titles"
+        android:entryValues="@array/pref_countdown_duration_values"
+        android:defaultValue="0"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+
+    <ListPreference
+        android:key="countdown_sound"
+        android:title="@string/pref_title_countdown_sound"
+        android:entries="@array/pref_countdown_sound_titles"
+        android:entryValues="@array/pref_countdown_sound_values"
+        android:defaultValue="beep"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
 <!--

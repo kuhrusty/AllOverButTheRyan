@@ -34,7 +34,9 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
     //  this value is duplicated in pref_general.xml.
     private int timerDuration = SettingsActivity.DEFAULT_TIMER_DURATION;
+    private int countdownDuration = 0;
     private int secondsRemaining = timerDuration;
+    private int lastTickSecondsRemaining = -1;
     private long timerIntervalMS = 1000L;
 //            getDefaultSharedPreferences(this).getInt(KEY_PREF_TIMER_SECONDS, 30);
     private boolean timerRunning = false;
@@ -61,6 +63,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         timerDuration = SettingsActivity.getTimerDuration(sharedPref);
+        countdownDuration = SettingsActivity.getCountdownDuration(sharedPref);
         secondsRemaining = timerDuration;
         isSand = SettingsActivity.isSand(sharedPref);
 
@@ -115,6 +118,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
             mediaPlayer = null;
         }
         secondsRemaining = timerDuration;
+        lastTickSecondsRemaining = -1;
 
         Resources res = getResources();
         timerDisplay.setText(formatSeconds(secondsRemaining));
@@ -183,6 +187,18 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
     void handleTick(int secondsRemaining) {
         timerDisplay.setText(formatSeconds(secondsRemaining));
+        if ((countdownDuration > 0) && (secondsRemaining <= countdownDuration) &&
+            (secondsRemaining != lastTickSecondsRemaining)) {
+            //  figure out which audio file to play
+//well, initially, the only option is beeping
+            int sound = R.raw.lowbeep;
+            if (mediaPlayer != null) {
+                mediaPlayer.release();
+            }
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), sound);
+            mediaPlayer.start();
+        }
+        lastTickSecondsRemaining = secondsRemaining;
     }
 
     void handleTimeUp() {
@@ -281,13 +297,18 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         return super.onOptionsItemSelected(item);
     }
 
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
+    @Override
+    protected void onPause() {
+        super.onPause();
 //Log.d(LOG_TAG, "got onPause(), unregistering pref change listener");
 //        PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 //                .unregisterOnSharedPreferenceChangeListener(this);
-//    }
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
 //    @Override
 //    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 //        if (key.equals(SettingsActivity.KEY_PREF_TIMER_DURATION)) {
@@ -305,6 +326,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             timerDuration = SettingsActivity.getTimerDuration(sharedPref);
+            countdownDuration = SettingsActivity.getCountdownDuration(sharedPref);
             isSand = SettingsActivity.isSand(sharedPref);
             resetTimer();
         }
