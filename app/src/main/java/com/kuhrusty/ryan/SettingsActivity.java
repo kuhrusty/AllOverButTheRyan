@@ -1,6 +1,7 @@
 package com.kuhrusty.ryan;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -21,9 +22,30 @@ import android.preference.PreferenceManager;
  */
 public class SettingsActivity extends PreferenceActivity {
 
+    //  this value is duplicated in pref_general.xml.
+    public static final int DEFAULT_TIMER_DURATION = 30;
+
     /**  in seconds. */
     public static final String KEY_PREF_TIMER_DURATION = "timer_duration";
     public static final String KEY_PREF_SOUND = "sound";
+
+    /**
+     * Returns the currently selected timer duration in seconds.
+     *
+     * @param prefs must not be null.
+     */
+    public static int getTimerDuration(SharedPreferences prefs) {
+        return Integer.parseInt(prefs.getString(KEY_PREF_TIMER_DURATION,
+                Integer.toString(DEFAULT_TIMER_DURATION)));
+    }
+    /**
+     * Returns the currently selected sound name (or other code, like "random").
+     *
+     * @param prefs must not be null.
+     */
+    public static String getSound(SharedPreferences prefs) {
+        return prefs.getString(KEY_PREF_SOUND, "ryan");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

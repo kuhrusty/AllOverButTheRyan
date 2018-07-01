@@ -32,8 +32,8 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 //String KEY_PREF_TIMER_SECONDS = "timer_seconds";
 
     //  this value is duplicated in pref_general.xml.
-    private final int defaultSecondsRemaining = 30;
-    private int secondsRemaining = defaultSecondsRemaining;
+    private int timerDuration = SettingsActivity.DEFAULT_TIMER_DURATION;
+    private int secondsRemaining = timerDuration;
     private long timerIntervalMS = 1000L;
 //            getDefaultSharedPreferences(this).getInt(KEY_PREF_TIMER_SECONDS, 30);
     private boolean timerRunning = false;
@@ -57,7 +57,8 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         Resources res = getResources();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        secondsRemaining = Integer.parseInt(sharedPref.getString(SettingsActivity.KEY_PREF_TIMER_DURATION, "" + defaultSecondsRemaining));
+        timerDuration = SettingsActivity.getTimerDuration(sharedPref);
+        secondsRemaining = timerDuration;
 
         // Create the text view
         TextView tv = new TextView(this);
@@ -102,8 +103,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
             mediaPlayer.release();
             mediaPlayer = null;
         }
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        secondsRemaining = Integer.parseInt(sharedPref.getString(SettingsActivity.KEY_PREF_TIMER_DURATION, "" + defaultSecondsRemaining));
+        secondsRemaining = timerDuration;
 
         Resources res = getResources();
         timerDisplay.setText(formatSeconds(secondsRemaining));
@@ -182,7 +182,7 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
 
         //  figure out which audio file to play
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String soundName = sharedPref.getString(SettingsActivity.KEY_PREF_SOUND, "ryan");
+        String soundName = SettingsActivity.getSound(sharedPref);
         int sound = R.raw.ryan;
         //Log.d(LOG_TAG, "choosing sound: " + soundName);
         if (soundName.equals("random")) sound = nextRand();
