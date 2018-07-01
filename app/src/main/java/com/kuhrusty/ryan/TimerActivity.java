@@ -3,6 +3,7 @@ package com.kuhrusty.ryan;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -48,6 +49,10 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_timer);
+
+        //  When people hit the volume buttons, we want to change the media
+        //  volume, not the ringtone volume.
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         Resources res = getResources();
 
