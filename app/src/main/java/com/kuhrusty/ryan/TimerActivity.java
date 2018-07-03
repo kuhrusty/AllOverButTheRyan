@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,12 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
         //  When people hit the volume buttons, we want to change the media
         //  volume, not the ringtone volume.
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        //  We want the device to stay on, so it doesn't have to be unlocked
+        //  to start the timer.  We *could* set this when resetting the timer,
+        //  and clear it when the timer expires (so that the device *can* turn
+        //  off on the "take your damn turn" screen)...
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Resources res = getResources();
 

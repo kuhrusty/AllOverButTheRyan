@@ -10,6 +10,7 @@ will continue counting down with 41 seconds remaining).
 ### INTERESTING STUFF IN THE CODE
 
 - setting the default volume control stream (`TimerActivity.java`)
+- keeping the screen on while running (`TimerActivity.java`)
 - working around `CountDownTimer` strangeness (`TimerActivity.java`)
 - handling different types of preferences (`SettingsActivity.java`)
 
