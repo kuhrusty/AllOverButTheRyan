@@ -62,7 +62,7 @@
     <string name="pref_sound_value_random">random</string>
 
     <string name="pref_title_sand">Sand Timer</string>
-    <string name="pref_summary_sand">Tapping the screen swaps elapsed &amp; remaining time (bring up Settings to reset)</string>
+    <string name="pref_summary_sand">Tapping the screen swaps elapsed &amp; remaining time (long press to reset)</string>
 
     <string name="pref_title_countdown_duration">Countdown Duration</string>
     <string-array name="pref_countdown_duration_titles">

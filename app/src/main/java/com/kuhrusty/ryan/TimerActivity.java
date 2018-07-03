@@ -109,6 +109,18 @@ public class TimerActivity extends ActionBarActivity {//implements SharedPrefere
                 }
             }
         });
+        tv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //  originally this was if (sand && timerRunning), but we want
+                //  long clicks to reset regular non-sand timers too.
+                if (timerRunning) {
+                    resetTimer();
+                    return true;
+                }
+                return false;
+            }
+        });
         setContentView(tv);
         timerDisplay = tv;
     }
