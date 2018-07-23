@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -26,7 +26,7 @@ import java.util.Random;
  * This displays the remaining time; when tapped, it starts the countdown, and
  * when tapped again, it resets.
  */
-public class TimerActivity extends ActionBarActivity {//implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class TimerActivity extends AppCompatActivity {//implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String LOG_TAG = "AllOverButTheRyan";
 
