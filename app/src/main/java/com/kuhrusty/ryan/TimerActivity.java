@@ -5,18 +5,22 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.support.v7.widget.AppCompatTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,8 +79,20 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         isSand = SettingsActivity.isSand(sharedPref);
 
         // Create the text view
-        TextView tv = new TextView(this);
-        tv.setTextSize(120);
+        TextView tv;
+        //  This seems... excessive...
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            tv = new TextView(this);
+            tv.setAutoSizeTextTypeUniformWithConfiguration(
+                    40, 200, 20, TypedValue.COMPLEX_UNIT_DIP);
+        } else {
+            tv = new AppCompatTextView(this);
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(tv,
+                    40, 200, 20, TypedValue.COMPLEX_UNIT_DIP);
+        }
+        //  setMaxLines() is because, otherwise, even though we're auto-sizing
+        //  the text, "5:00" will get wrapped to "5:0\n0" !?
+        tv.setMaxLines(1);
         tv.setText(formatSeconds(secondsRemaining));
         tv.setTextColor(res.getColor(R.color.waitingFG));
         tv.setBackgroundColor(res.getColor(R.color.waitingBG));
@@ -140,6 +156,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         lastTickSecondsRemaining = -1;
 
         Resources res = getResources();
+        timerDisplay.setMaxLines(1);  //  see comment where this is done above
         timerDisplay.setText(formatSeconds(secondsRemaining));
         timerDisplay.setTextColor(res.getColor(R.color.waitingFG));
         timerDisplay.setBackgroundColor(res.getColor(R.color.waitingBG));
@@ -237,6 +254,9 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
             //case 4: text = res.getText(R.string.arghh5); break;
             //case 5: text = res.getText(R.string.arghh6); break;
         }
+        //  bad hard-coding: we "know" TAKE YOUR DAMN TURN can be 4 lines, but
+        //  we need to undo the setMaxLines(1) done earlier.
+        timerDisplay.setMaxLines(4);
         timerDisplay.setText(text);
         timerDisplay.setTextColor(res.getColor(R.color.endedFG));
         timerDisplay.setBackgroundColor(res.getColor(R.color.endedBG));
