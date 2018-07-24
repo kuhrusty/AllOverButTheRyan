@@ -35,7 +35,14 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
     private static final String LOG_TAG = "AllOverButTheRyan";
 
     private static final int REQUEST_CODE_SETTINGS = 1;
-//String KEY_PREF_TIMER_SECONDS = "timer_seconds";
+
+    //  savedInstanceState keys
+    private static final String KEY_TIMER_RUNNING = "timerRunning";
+    private static final String KEY_TIMER_FINISHED = "timerFinished";
+    private static final String KEY_SECONDS_REMAINING = "secondsRemaining";
+    private static final String KEY_LAST_TICK_SECONDS_REMAINING = "lastTickSecondsRemaining";
+    private static final String KEY_RUNS = "runs";
+    private static final String KEY_TIMEOUTS = "timeouts";
 
     //  this value is duplicated in pref_general.xml.
     private int timerDuration = SettingsActivity.DEFAULT_TIMER_DURATION;
@@ -78,25 +85,35 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         secondsRemaining = timerDuration;
         isSand = SettingsActivity.isSand(sharedPref);
 
+        if (savedInstanceState != null) {
+            timerRunning = savedInstanceState.getBoolean(KEY_TIMER_RUNNING);
+            timerFinished = savedInstanceState.getBoolean(KEY_TIMER_FINISHED);
+            secondsRemaining = savedInstanceState.getInt(KEY_SECONDS_REMAINING);
+            lastTickSecondsRemaining = savedInstanceState.getInt(KEY_LAST_TICK_SECONDS_REMAINING);
+            runs = savedInstanceState.getInt(KEY_RUNS);
+            timeouts = savedInstanceState.getInt(KEY_TIMEOUTS);
+        }
+
         // Create the text view
-        TextView tv;
         //  This seems... excessive...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            tv = new TextView(this);
-            tv.setAutoSizeTextTypeUniformWithConfiguration(
+            timerDisplay = new TextView(this);
+            timerDisplay.setAutoSizeTextTypeUniformWithConfiguration(
                     40, 200, 20, TypedValue.COMPLEX_UNIT_DIP);
         } else {
-            tv = new AppCompatTextView(this);
-            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(tv,
+            timerDisplay = new AppCompatTextView(this);
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(timerDisplay,
                     40, 200, 20, TypedValue.COMPLEX_UNIT_DIP);
         }
-        //  setMaxLines() is because, otherwise, even though we're auto-sizing
-        //  the text, "5:00" will get wrapped to "5:0\n0" !?
-        tv.setMaxLines(1);
-        tv.setText(formatSeconds(secondsRemaining));
-        tv.setTextColor(res.getColor(R.color.waitingFG));
-        tv.setBackgroundColor(res.getColor(R.color.waitingBG));
-        tv.setGravity(Gravity.CENTER);
+        timerDisplay.setGravity(Gravity.CENTER);
+
+        if (timerRunning) {
+            startTimer(true);
+        } else if (timerFinished) {
+            handleTimeUp(true);
+        } else {
+            resetTimer();
+        }
 //        tv.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent event) {
@@ -109,7 +126,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
 //                return true;
 //            }
 //        });
-        tv.setOnClickListener(new View.OnClickListener() {
+        timerDisplay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (timerFinished) {
@@ -121,11 +138,11 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
                         resetTimer();
                     }
                 } else {
-                    startTimer();
+                    startTimer(false);
                 }
             }
         });
-        tv.setOnLongClickListener(new View.OnLongClickListener() {
+        timerDisplay.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 //  originally this was if (sand && timerRunning), but we want
@@ -137,8 +154,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
                 return false;
             }
         });
-        setContentView(tv);
-        timerDisplay = tv;
+        setContentView(timerDisplay);
     }
 
     void resetTimer() {
@@ -156,7 +172,9 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         lastTickSecondsRemaining = -1;
 
         Resources res = getResources();
-        timerDisplay.setMaxLines(1);  //  see comment where this is done above
+        //  setMaxLines() is because, otherwise, even though we're auto-sizing
+        //  the text, "5:00" will get wrapped to "5:0\n0" !?
+        timerDisplay.setMaxLines(1);
         timerDisplay.setText(formatSeconds(secondsRemaining));
         timerDisplay.setTextColor(res.getColor(R.color.waitingFG));
         timerDisplay.setBackgroundColor(res.getColor(R.color.waitingBG));
@@ -172,14 +190,16 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         //  we're gaining or losing half a second.  I think that'll be OK
         //  for board games, though.
         secondsRemaining = timerDuration - secondsRemaining;
-        startTimer();
+        startTimer(false);
     }
 
-    void startTimer() {
+    void startTimer(boolean restoringState) {
         if (timer != null) {
             timer.cancel();
         }
-        ++runs;
+        if (!restoringState) {
+            ++runs;
+        }
         //  OK... there is a, uhh... well, let's say "bug," where CountDownTimer
         //  won't deliver the last tick because a few ms fewer than a full
         //  interval remains, so it goes 5, 4, 3, 2... ... onFinish().  So one
@@ -197,7 +217,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
             @Override
             public void onFinish() {
                 //Log.d(LOG_TAG, "timer onFinish()");
-                handleTimeUp();
+                handleTimeUp(false);
             }
         };
         timer.start();
@@ -237,9 +257,12 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         lastTickSecondsRemaining = secondsRemaining;
     }
 
-    void handleTimeUp() {
+    void handleTimeUp(boolean restoringState) {
         //  set timer = null?
-        ++timeouts;
+        if (!restoringState) {
+            ++timeouts;
+        }
+        timerRunning = false;
         timerFinished = true;
         Resources res = getResources();
         CharSequence text = res.getText(R.string.arghh1);
@@ -260,6 +283,8 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         timerDisplay.setText(text);
         timerDisplay.setTextColor(res.getColor(R.color.endedFG));
         timerDisplay.setBackgroundColor(res.getColor(R.color.endedBG));
+
+        if (restoringState) return;  //  we don't want to re-play the sound
 
         //  figure out which audio file to play
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -297,6 +322,23 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
             case 5: return R.raw.stab;
         }
         return R.raw.ryan;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putBoolean(KEY_TIMER_RUNNING, timerRunning);
+        savedInstanceState.putBoolean(KEY_TIMER_FINISHED, timerFinished);
+        //  Because we only store the number of seconds remaining, not
+        //  milliseconds, you can extend the timer by a fraction of a second
+        //  when rotating the phone.  But as long as this is just used for
+        //  boardgames, not brain surgery or navigating a nuclear submarine, we
+        //  should be OK.
+        savedInstanceState.putInt(KEY_SECONDS_REMAINING, secondsRemaining);
+        savedInstanceState.putInt(KEY_LAST_TICK_SECONDS_REMAINING, lastTickSecondsRemaining);
+        savedInstanceState.putInt(KEY_RUNS, runs);
+        savedInstanceState.putInt(KEY_TIMEOUTS, timeouts);
     }
 
     @Override
