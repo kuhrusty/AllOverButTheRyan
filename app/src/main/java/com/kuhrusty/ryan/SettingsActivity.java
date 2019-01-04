@@ -183,11 +183,6 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
 
         // Trigger the listener immediately with the preference's
         // current value.
-        manuallyTriggerPreferenceChange(sBindPreferenceSummaryToValueListener, preference);
-    }
-
-    private static void manuallyTriggerPreferenceChange(Preference.OnPreferenceChangeListener pcl,
-                                                        Preference preference) {
         Object value = null;
         if ((preference instanceof CheckBoxPreference) || (preference instanceof SwitchPreference)) {
             value = PreferenceManager
@@ -198,7 +193,7 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
                     .getDefaultSharedPreferences(preference.getContext())
                     .getString(preference.getKey(), "");
         }
-        pcl.onPreferenceChange(preference, value);
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
     }
 
     /**
@@ -222,14 +217,6 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
-//            setHasOptionsMenu(true);
-
-//            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-//            // to their values. When their values change, their summaries are
-//            // updated to reflect the new value, per the Android Design
-//            // guidelines.
-//            bindPreferenceSummaryToValue(findPreference("example_text"));
-//            bindPreferenceSummaryToValue(findPreference("example_list"));
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
@@ -242,15 +229,6 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
             bindPreferenceSummaryToValue(findPreference(KEY_PREF_COUNTDOWN_SOUND));
         }
 
-//        @Override
-//        public boolean onOptionsItemSelected(MenuItem item) {
-//            int id = item.getItemId();
-//            if (id == android.R.id.home) {
-//                startActivity(new Intent(getActivity(), SettingsActivity.class));
-//                return true;
-//            }
-//            return super.onOptionsItemSelected(item);
-//        }
     }
 
 //    /**
