@@ -30,6 +30,7 @@ public class SettingsActivity extends PreferenceActivity {
     /**  in seconds. */
     public static final String KEY_PREF_TIMER_DURATION = "timer_duration";
     public static final String KEY_PREF_SOUND = "sound";
+    public static final String KEY_PREF_PAUSE = "pause";
     public static final String KEY_PREF_SAND = "sand";
     public static final String KEY_PREF_COUNTDOWN_DURATION = "countdown_duration";
     public static final String KEY_PREF_COUNTDOWN_SOUND = "countdown_sound";
@@ -50,6 +51,15 @@ public class SettingsActivity extends PreferenceActivity {
      */
     public static String getSound(SharedPreferences prefs) {
         return prefs.getString(KEY_PREF_SOUND, "ryan");
+    }
+    /**
+     * Returns true if tap-to-pause-instead-of-reset is currently selected.
+     * If this is true, isSand() will be ignored.
+     *
+     * @param prefs must not be null.
+     */
+    public static boolean hasPause(SharedPreferences prefs) {
+        return prefs.getBoolean(KEY_PREF_PAUSE, false);
     }
     /**
      * Returns true if sand-timer mode is currently selected.
@@ -123,7 +133,9 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
 
-            if (KEY_PREF_SAND.equals(preference.getKey())) {
+            if (KEY_PREF_PAUSE.equals(preference.getKey())) {
+                preference.setSummary(R.string.pref_summary_pause);
+            } else if (KEY_PREF_SAND.equals(preference.getKey())) {
                 preference.setSummary(R.string.pref_summary_sand);
             } else if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
@@ -177,9 +189,10 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
      *
      * @see #sBindPreferenceSummaryToValueListener
      */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    private static void bindPreferenceSummaryToValue(Preference preference,
+                                                     Preference.OnPreferenceChangeListener pcl) {
         // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        preference.setOnPreferenceChangeListener(pcl);
 
         // Trigger the listener immediately with the preference's
         // current value.
@@ -193,7 +206,7 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
                     .getDefaultSharedPreferences(preference.getContext())
                     .getString(preference.getKey(), "");
         }
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
+        pcl.onPreferenceChange(preference, value);
     }
 
     /**
@@ -212,7 +225,8 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
      * activity is showing a two-pane settings UI.
      */
 //    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
+    public static class GeneralPreferenceFragment extends PreferenceFragment
+            implements Preference.OnPreferenceChangeListener {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -222,13 +236,40 @@ getFragmentManager().beginTransaction().replace(android.R.id.content, new Genera
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference(KEY_PREF_TIMER_DURATION));
-            bindPreferenceSummaryToValue(findPreference(KEY_PREF_SOUND));
-            bindPreferenceSummaryToValue(findPreference(KEY_PREF_SAND));
-            bindPreferenceSummaryToValue(findPreference(KEY_PREF_COUNTDOWN_DURATION));
-            bindPreferenceSummaryToValue(findPreference(KEY_PREF_COUNTDOWN_SOUND));
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_TIMER_DURATION), this);
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_SOUND), this);
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_PAUSE), this);
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_SAND), this);
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_COUNTDOWN_DURATION), this);
+            bindPreferenceSummaryToValue(findPreference(KEY_PREF_COUNTDOWN_SOUND), this);
         }
 
+        /**
+         * This is sort of a wrapper around the static
+         * sBindPreferenceSummaryToValueListener, which didn't have access to
+         * the PreferenceFragment for findPreference().
+         */
+        @Override
+        public boolean onPreferenceChange(Preference preference, Object value) {
+            //  Pause and Sand Timer are mutually exclusive.
+            if (KEY_PREF_PAUSE.equals(preference.getKey())) {
+                if ((value instanceof Boolean) && ((Boolean)value)) {
+                    turnOff(KEY_PREF_SAND);
+                }
+            } else if (KEY_PREF_SAND.equals(preference.getKey())) {
+                if ((value instanceof Boolean) && ((Boolean)value)) {
+                    turnOff(KEY_PREF_PAUSE);
+                }
+            }
+            return sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
+        }
+
+        private void turnOff(String prefKey) {
+            SwitchPreference sp = (SwitchPreference)findPreference(prefKey);
+            if ((sp != null) && sp.isChecked()) {
+                sp.setChecked(false);
+            }
+        }
     }
 
 //    /**

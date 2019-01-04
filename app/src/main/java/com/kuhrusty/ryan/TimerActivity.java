@@ -53,6 +53,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
 //            getDefaultSharedPreferences(this).getInt(KEY_PREF_TIMER_SECONDS, 30);
     private boolean timerRunning = false;
     private boolean timerFinished = false;
+    private boolean hasPause = false;
     private boolean isSand = false;
     private int runs = 0;
     private int timeouts = 0;
@@ -83,6 +84,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         timerDuration = SettingsActivity.getTimerDuration(sharedPref);
         countdownDuration = SettingsActivity.getCountdownDuration(sharedPref);
         secondsRemaining = timerDuration;
+        hasPause = SettingsActivity.hasPause(sharedPref);
         isSand = SettingsActivity.isSand(sharedPref);
 
         if (savedInstanceState != null) {
@@ -112,7 +114,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
         } else if (timerFinished) {
             handleTimeUp(true);
         } else {
-            resetTimer();
+            resetTimer(hasPause ? secondsRemaining : timerDuration);
         }
 //        tv.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
@@ -130,12 +132,14 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
             @Override
             public void onClick(View v) {
                 if (timerFinished) {
-                    resetTimer();
+                    resetTimer(timerDuration);
                 } else if (timerRunning) {
-                    if (isSand) {
+                    if (hasPause) {
+                        resetTimer(secondsRemaining);
+                    } else if (isSand) {
                         flipTimer();
                     } else {
-                        resetTimer();
+                        resetTimer(timerDuration);
                     }
                 } else {
                     startTimer(false);
@@ -146,18 +150,17 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
             @Override
             public boolean onLongClick(View v) {
                 //  originally this was if (sand && timerRunning), but we want
-                //  long clicks to reset regular non-sand timers too.
-                if (timerRunning) {
-                    resetTimer();
-                    return true;
-                }
-                return false;
+                //  long clicks to reset regular non-sand timers too, *and* we
+                //  want to reset the timer back to its starting value if we're
+                //  paused.
+                resetTimer(timerDuration);
+                return true;
             }
         });
         setContentView(timerDisplay);
     }
 
-    void resetTimer() {
+    void resetTimer(int duration) {
         timerRunning = false;
         timerFinished = false;
         if (timer != null) {
@@ -168,7 +171,7 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
             mediaPlayer.release();
             mediaPlayer = null;
         }
-        secondsRemaining = timerDuration;
+        secondsRemaining = duration;
         lastTickSecondsRemaining = -1;
 
         Resources res = getResources();
@@ -408,8 +411,9 @@ public class TimerActivity extends AppCompatActivity {//implements SharedPrefere
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             timerDuration = SettingsActivity.getTimerDuration(sharedPref);
             countdownDuration = SettingsActivity.getCountdownDuration(sharedPref);
+            hasPause = SettingsActivity.hasPause(sharedPref);
             isSand = SettingsActivity.isSand(sharedPref);
-            resetTimer();
+            resetTimer(timerDuration);
         }
     }
 }

@@ -25,6 +25,12 @@
         android:positiveButtonText="@null" />
 
     <SwitchPreference
+        android:key="pause"
+        android:title="@string/pref_title_pause"
+        android:summary="@string/pref_summary_pause"
+        android:defaultValue="false" />
+
+    <SwitchPreference
         android:key="sand"
         android:title="@string/pref_title_sand"
         android:summary="@string/pref_summary_sand"

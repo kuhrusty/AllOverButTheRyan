@@ -61,6 +61,9 @@
     </string-array>
     <string name="pref_sound_value_random">random</string>
 
+    <string name="pref_title_pause">Pause</string>
+    <string name="pref_summary_pause">Tapping the screen pauses the timer instead of resetting (long press to reset)</string>
+
     <string name="pref_title_sand">Sand Timer</string>
     <string name="pref_summary_sand">Tapping the screen swaps elapsed &amp; remaining time (long press to reset)</string>
 
